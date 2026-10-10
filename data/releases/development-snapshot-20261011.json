@@ -1,0 +1,57 @@
+{
+  "tag": "development-snapshot-20261011",
+  "repository": "kodusim/heritage_forecast",
+  "exclusions": [
+    "reports and manuscripts",
+    "Word documents",
+    "KakaoTalk conversations",
+    "virtual environments",
+    "redundant build installations"
+  ],
+  "original_data_unique_files": 14,
+  "original_data_duplicate_paths": 14,
+  "assets": [
+    {
+      "name": "original-data.zip",
+      "bytes": 425593138,
+      "sha256": "c1225394c22d45432772c3997f6095ed46d3d36a0b5a54e1f911484ff3e34167",
+      "files": 14
+    },
+    {
+      "name": "preprocessing-data.zip",
+      "bytes": 220407933,
+      "sha256": "e66b9e89a1e014f30a78f537fc596fcde90554e3a2e5a2787d6c0af45ef40825",
+      "files": 131
+    },
+    {
+      "name": "trained-models-and-results.zip",
+      "bytes": 263760688,
+      "sha256": "1995a183abe74c85da3c71517c7feee8ed4e9d8cdb935896852f7a7e04156ad6",
+      "files": 3324
+    },
+    {
+      "name": "gui-projects.zip",
+      "bytes": 303594661,
+      "sha256": "ba4ef1871f18c5844ba3687e368b1bb2beac0af089d9a883821493e744ba3d7a",
+      "files": 3
+    },
+    {
+      "name": "verification-workspaces.zip",
+      "bytes": 541298313,
+      "sha256": "d98df198365f44f0f2b0af838ac4c32208b0a45c62e536a6dd042a547b016536",
+      "files": 427
+    },
+    {
+      "name": "development-source.zip",
+      "bytes": 119039,
+      "sha256": "41fd54412aaf56b47435c5d3325f9264f9546a31e5217d4aaca38bd39f6c6f30",
+      "files": 59
+    },
+    {
+      "name": "HeritageStudio-Windows-x64.zip",
+      "bytes": 440170000,
+      "sha256": "3de33f4db6b8314fd00ff833db5ee8117dccf60b88a06de869ae689f39862411",
+      "files": 23858
+    }
+  ]
+}

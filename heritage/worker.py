@@ -18,6 +18,13 @@ def main(request_path):
         if kind=='import':
             from .data import import_data
             result=import_data(project,cfg,progress,cancel)
+        elif kind=='registration':
+            from .history import change_registration
+            result=change_registration(project,cfg['id'],cfg['enabled'],progress,cancel)
+        elif kind=='origins':
+            from .history import eligible_origins
+            valid,latest=eligible_origins(project,project.get(cfg['model_id']))
+            result={'times':[str(x) for x in valid],'latest':str(latest),'model_id':cfg['model_id']}
         elif kind=='train':
             from .engine import train
             result=train(project,cfg,progress,cancel)

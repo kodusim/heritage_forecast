@@ -7,6 +7,8 @@ import hashlib
 import importlib.metadata as metadata
 import json
 import shutil
+import os
+import subprocess
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -14,9 +16,10 @@ from packaging.requirements import Requirement
 
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'portable'/'HeritageStudio'
-RUNTIME=DEST/'runtime'
-PACKAGES=DEST/'packages'
-APP=DEST/'app'
+INTERNAL=DEST/'_internal'
+RUNTIME=INTERNAL/'runtime'
+PACKAGES=INTERNAL/'packages'
+APP=INTERNAL/'app'
 for path in (RUNTIME,PACKAGES,APP):path.mkdir(parents=True,exist_ok=True)
 archive=ROOT/'.cache'/'python-3.12.10-embed-amd64.zip'
 archive.parent.mkdir(parents=True,exist_ok=True)
@@ -46,7 +49,10 @@ shutil.copy2(ROOT/'main.py',APP/'main.py')
 shutil.copytree(ROOT/'heritage',APP/'heritage',dirs_exist_ok=True,ignore=shutil.ignore_patterns('__pycache__'))
 for name in ('README','NOTICE'):
     if (ROOT/name).exists():shutil.copy2(ROOT/name,DEST/name)
-(DEST/'run.cmd').write_text('@echo off\ncd /d "%~dp0"\nstart "" "runtime\\pythonw.exe" "app\\main.py"\n',encoding='ascii')
-(DEST/'diagnose.cmd').write_text('@echo off\ncd /d "%~dp0"\n"runtime\\python.exe" "app\\main.py"\npause\n',encoding='ascii')
+(DEST/'run.cmd').write_text('@echo off\ncd /d "%~dp0"\nstart "" "_internal\\runtime\\pythonw.exe" "_internal\\app\\main.py"\n',encoding='ascii')
+(DEST/'diagnose.cmd').write_text('@echo off\ncd /d "%~dp0"\n"_internal\\runtime\\python.exe" "_internal\\app\\main.py"\npause\n',encoding='ascii')
+compiler=Path(os.environ.get('WINDIR','C:/Windows'))/'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+subprocess.run([str(compiler),'/nologo','/target:winexe','/reference:System.Windows.Forms.dll',
+    '/win32icon:'+str(ROOT/'heritage/assets/heritage.ico'),'/out:'+str(DEST/'HeritageStudio.exe'),str(ROOT/'tools/Launcher.cs')],check=True)
 (DEST/'distribution.json').write_text(json.dumps({'runtime_source':url,'runtime_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'packages':versions,'package_files':copied},indent=2),encoding='utf-8')
 print('Portable distribution ready:',DEST,flush=True)

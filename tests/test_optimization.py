@@ -28,7 +28,10 @@ def test_2024_values_cannot_change_2023_training_or_validation():
     x,y,delta,meta=prepare_arrays(d,'5-D3',cfg,2023)
     changed=d.copy();changed.loc[changed.index>='2024-01-01']=123456789.
     xx,yy,dd,mm=prepare_arrays(changed,'5-D3',cfg,2023)
-    assert meta==mm
+    # DataFrame copies can change array layout and reduction rounding at float64
+    # machine precision. Keep all non-numeric metadata and float32 inputs exact.
+    np.testing.assert_allclose(meta['feature_scale'],mm['feature_scale'],rtol=1e-14,atol=0)
+    assert {k:v for k,v in meta.items() if k!='feature_scale'}=={k:v for k,v in mm.items() if k!='feature_scale'}
     for split in ['train','validation']:
         assert torch.equal(x[split],xx[split]);assert torch.equal(y[split],yy[split])
 

@@ -1,0 +1,8 @@
+{
+  "tool": "built-in image_gen",
+  "use": "desktop app icon",
+  "prompt": "Use case: logo-brand. Create a polished square Windows desktop application icon for Korean cultural heritage forecasting software. Subject: a recognizable Korean ancient grassy royal burial mound, softly rounded green tumulus with a small stone entrance, a second smaller mound behind. Elegant restrained illustrated 3D style, bold simple silhouette readable at 32 pixels. Deep teal rounded-square tile background, warm ivory stone detail, subtle small scientific time-series curve integrated near foreground. No lettering, no watermark, no border outside tile. Single centered icon, fills image with comfortable margins. Save generated asset for use in desktop software.",
+  "png": "heritage.png",
+  "ico": "heritage.ico",
+  "note": "ICO is a format conversion for Windows application packaging."
+}

@@ -90,6 +90,8 @@ class Project:
         ident = record_id or uid()
         with self.connect() as c:
             c.execute("INSERT INTO records VALUES(?,?,?,?)", (ident,kind,now(),json.dumps(payload,ensure_ascii=False,allow_nan=False)))
+            if kind == 'dataset':
+                c.execute("INSERT OR REPLACE INTO settings VALUES('active_dataset',?)", (ident,))
         return ident
 
     def update(self, ident, payload):
@@ -115,6 +117,8 @@ class Project:
         return p
 
     def latest_dataset(self):
+        active = self.setting('active_dataset', None)
+        if active is not None: return self.get(active) if active else None
         rows = self.list('dataset')
         return rows[0] if rows else None
 

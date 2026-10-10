@@ -165,7 +165,10 @@ def import_data(project,req,progress=lambda _:None,cancel=lambda:None):
     path=Path(req['path']); digest=sha(path)
     prior=project.latest_dataset()
     signature=sha_mapping(req)
+    from .history import disabled
+    excluded = disabled(project)
     for rec in project.list('dataset'):
+        if rec['id'] in excluded: continue
         if rec.get('source_hash')==digest and rec.get('mapping_hash')==signature:
             raise ValueError('동일한 파일과 매핑을 이미 등록했습니다. 데이터가 중복 추가되지 않았습니다.')
     parts=[];invalid=0
@@ -189,11 +192,12 @@ def import_data(project,req,progress=lambda _:None,cancel=lambda:None):
     if sha(path)!=digest: raise ValueError('읽는 동안 원본 파일이 변경되었습니다. 파일을 닫고 다시 등록하세요.')
     if not src.exists(): shutil.copy2(path,src)
     if sha(src)!=digest: raise ValueError('보관한 원본의 검증에 실패했습니다. 다시 등록하세요.')
-    payload={'file':rel,'parent':prior['id'] if prior else None,'rows':len(df),'start':str(df.index.min()),'end':str(df.index.max()),
+    payload={'import_order':1+max((r.get('import_order',0) for r in project.list('dataset')),default=0),'file':rel,'parent':prior['id'] if prior else None,'rows':len(df),'start':str(df.index.min()),'end':str(df.index.max()),
              'columns':meta,'quality':quality(df),'source_hash':digest,'mapping_hash':signature,'source_name':path.name,
              'source_file':src.relative_to(project.path).as_posix(),'mappings':req['mappings'],'conflict_policy':req.get('conflicts','reject'),
              'invalid_dates':invalid,**issues}
     project.add('dataset',payload,ident)
+    project.set_setting('active_dataset',ident)
     return ident
 
 def sha_mapping(req):

@@ -28,6 +28,7 @@ QPushButton:hover { background:#eaf1f7; border-color:#9cabbc; }
 QPushButton:disabled { color:#9da8b5; background:#f0f2f5; border-color:#e1e5eb; }
 QPushButton#primary { background:#087f70; border-color:#087f70; color:white; }
 QPushButton#primary:hover { background:#066759; }
+QPushButton#primary:disabled { background:#e5ebe9; border-color:#d8e1dd; color:#82938e; }
 QPushButton#nav { text-align:left; padding:13px 16px; background:transparent; border:0; color:#c5d2df; font-size:14px; }
 QPushButton#nav:checked { color:white; background:#264258; border-left:3px solid #44c6b1; border-radius:4px; }
 QLineEdit,QSpinBox,QDoubleSpinBox,QComboBox { background:white; border:1px solid #ccd6e1; border-radius:5px; padding:7px; min-height:20px; }
@@ -68,10 +69,13 @@ class FrameModel(QAbstractTableModel):
     def columnCount(self,parent=None):return len(self.df.columns)
     def data(self,index,role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():return None
+        if role==Qt.ItemDataRole.ToolTipRole:return str(self.df.iloc[index.row(),index.column()])
         if role==Qt.ItemDataRole.DisplayRole:
             v=self.df.iloc[index.row(),index.column()]
             if pd.isna(v):return '—'
-            if isinstance(v,(float,np.floating)):return f'{v:.6g}'
+            if isinstance(v,(float,np.floating)):
+                if 0<abs(v)<1e-8:return '< 0.00000001' if v>0 else '> -0.00000001'
+                return f'{v:.8f}'.rstrip('0').rstrip('.') if abs(v)<1 else f'{v:,.6f}'.rstrip('0').rstrip('.')
             return str(v)
         return None
     def headerData(self,section,orientation,role=Qt.ItemDataRole.DisplayRole):
@@ -173,8 +177,8 @@ class MainWindow(QMainWindow):
         self.nav=[];self.stack=QStackedWidget()
         for i,text in enumerate(['01   프로젝트 현황','02   데이터 관리','03   학습과 비교','04   모델과 예측','05   논문 Figure']):
             b=button(text,lambda checked=False,n=i:self.navigate(n));b.setObjectName('nav');b.setCheckable(True);left.addWidget(b);self.nav.append(b)
-        left.addWidget(button('Transformer 결과',self.open_review,True))
-        left.addStretch();left.addWidget(button('사용 설명서',self.open_manual));left.addWidget(label('LOCAL WORKSPACE\n데이터는 이 PC에 저장됩니다.'));left.addWidget(label('v1.0 · 오프라인 연구 도구'))
+        left.addWidget(button('전체 고분 결과',self.open_review,True))
+        left.addStretch();left.addWidget(button('사용 설명서',self.open_manual));left.addWidget(label('LOCAL WORKSPACE\n데이터는 이 PC에 저장됩니다.'));left.addWidget(label('v2.0 · 오프라인 연구 도구'))
         outer.addWidget(sidebar)
         content=QWidget();right=QVBoxLayout(content);right.setContentsMargins(28,22,28,18);right.setSpacing(15)
         top=QHBoxLayout();top.addWidget(label('프로젝트','muted'));self.project_combo=QComboBox();self.project_combo.setMinimumWidth(210);top.addWidget(self.project_combo,1)
@@ -278,11 +282,11 @@ class MainWindow(QMainWindow):
         self.review_window=ReviewWindow();self.review_window.show();self.review_window.raise_();self.review_window.activateWindow()
 
     def open_manual(self):
-        candidates=[Path(__file__).resolve().parents[1]/'README',Path(__file__).resolve().parents[2]/'README']
+        candidates=[Path(__file__).resolve().parents[1]/'README.md',Path(__file__).resolve().parents[2]/'README.md']
         path=next((p for p in candidates if p.exists()),None)
-        if not path:return self.error('프로그램 폴더의 README를 확인하세요.')
+        if not path:return self.error('프로그램 폴더의 README.md를 확인하세요.')
         dialog=QDialog(self);dialog.setWindowTitle('Heritage Studio · 사용 설명서');dialog.resize(900,740)
-        layout=QVBoxLayout(dialog);view=QTextBrowser();view.setOpenExternalLinks(True);view.setPlainText(path.read_text(encoding='utf-8'));layout.addWidget(view)
+        layout=QVBoxLayout(dialog);view=QTextBrowser();view.setOpenExternalLinks(True);view.setMarkdown(path.read_text(encoding='utf-8'));layout.addWidget(view)
         buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Close);buttons.rejected.connect(dialog.reject);layout.addWidget(buttons);dialog.exec()
 
     def busy(self):return self.process is not None and self.process.state()!=QProcess.ProcessState.NotRunning
@@ -328,7 +332,7 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         ds=self.project.list('dataset') if self.project else [];models=self.project.list('model') if self.project else [];runs=self.project.list('run') if self.project else [];preds=self.project.list('prediction') if self.project else []
-        latest=ds[0] if ds else None
+        latest=self.project.latest_dataset() if self.project else None
         form_key=(str(self.project.path),latest['id']) if latest else None
         same_form=form_key is not None and self.form_dataset==form_key
         previous_targets=self.checked(self.targets);previous_envs=self.checked(self.envs)

@@ -106,6 +106,6 @@ class ReviewWindow(QMainWindow):
         finally:QApplication.restoreOverrideCursor()
 
     def open_management(self):
-        from .ui import MainWindow
+        from .studio import MainWindow
         if self.management is None:self.management=MainWindow()
         self.management.show();self.management.raise_();self.management.activateWindow()

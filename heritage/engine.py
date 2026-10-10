@@ -170,6 +170,8 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
 
 def predict(project,model_id,dataset_id=None,cancel=lambda:None,origin=None):
     model=project.get(model_id)
+    from .history import affected
+    if affected(project,model['dataset_id']):raise ValueError('취소한 데이터로 학습한 모델입니다. 현재 데이터로 다시 학습하세요.')
     if model.get('status')!='complete' or project.get(model['run_id']).get('status')!='complete':raise ValueError('완료된 학습의 모델만 예측할 수 있습니다.')
     raw,version=project.load_data(dataset_id)
     for name,meta in model['columns_meta'].items():

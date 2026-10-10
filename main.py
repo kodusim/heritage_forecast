@@ -32,11 +32,11 @@ def main():
     if not lock.tryLock(100):
         QMessageBox.information(None,'이미 실행 중','Heritage Studio가 이미 실행 중입니다. 열려 있는 창을 확인하세요.');return 0
     from heritage.review import review_projects
-    if '--results' in sys.argv or ('--manage' not in sys.argv and review_projects()):
+    if '--results' in sys.argv:
         from heritage.review_ui import ReviewWindow
         window=ReviewWindow()
     else:
-        from heritage.ui import MainWindow
+        from heritage.studio import MainWindow
         window=MainWindow()
     window.show()
     if '--screenshot' in sys.argv:

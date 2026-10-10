@@ -18,16 +18,16 @@ def metrics(actual,prediction):
     return {'n':len(a),'MAE':float(np.abs(err).mean()),'RMSE':float(np.sqrt((err**2).mean())),
             'R2':float(1-(err**2).sum()/den) if den>1e-20 else None}
 
-def network(kind,n_features,n_horizons,width=32):
+def network(kind,n_features,n_horizons,width=32,layers=1,dropout=.1):
     import torch
     from torch import nn
     class Net(nn.Module):
         def __init__(self):
             super().__init__()
-            if kind=='lstm': self.body=nn.LSTM(n_features,width,batch_first=True)
+            if kind=='lstm': self.body=nn.LSTM(n_features,width,num_layers=layers,dropout=dropout if layers>1 else 0.,batch_first=True)
             else:
                 self.proj=nn.Linear(n_features,width)
-                self.body=nn.TransformerEncoder(nn.TransformerEncoderLayer(width,4,width*2,dropout=.1,batch_first=True),num_layers=1)
+                self.body=nn.TransformerEncoder(nn.TransformerEncoderLayer(width,4,width*2,dropout=dropout,batch_first=True),num_layers=layers)
                 positions=torch.arange(4096).float().unsqueeze(1)
                 div=torch.exp(torch.arange(0,width,2).float()*(-np.log(10000.)/width))
                 pe=torch.zeros(4096,width);pe[:,0::2]=torch.sin(positions*div);pe[:,1::2]=torch.cos(positions*div)
@@ -42,7 +42,15 @@ def network(kind,n_features,n_horizons,width=32):
 def validate_config(cfg):
     if not 2<=int(cfg['lookback'])<=720: raise ValueError('입력 길이는 2~720시간입니다.')
     h=cfg['horizons']
-    if not h or len(set(h))!=len(h) or min(h)<1 or max(h)>720: raise ValueError('예측시간은 중복 없이 1~720시간으로 지정하세요.')
+    if not h or len(set(h))!=len(h) or min(h)<1 or max(h)>8760 or len(h)>720: raise ValueError('예측 범위는 최대 365일, 출력 지점은 최대 720개입니다. 긴 기간은 하루 간격을 사용하세요.')
+    if not 1e-6<=cfg.get('learning_rate',.001)<=.1:raise ValueError('학습률은 0.000001~0.1입니다.')
+    if cfg.get('width',32) not in (16,32,64,128):raise ValueError('모델 크기는 16, 32, 64, 128 중에서 선택하세요.')
+    if not 1<=cfg.get('layers',1)<=4 or not 0<=cfg.get('dropout',.1)<1:raise ValueError('층 수 또는 드롭아웃 범위를 확인하세요.')
+    if not 1<=cfg.get('batch_size',128)<=512:raise ValueError('배치 크기는 1~512입니다.')
+    if not 1<=cfg.get('evaluation_stride',1)<=8760:raise ValueError('평가 간격이 올바르지 않습니다.')
+    if cfg.get('forecast_step_hours'):
+        step=cfg['forecast_step_hours']
+        if h!=list(range(step,max(h)+1,step)):raise ValueError('미래 곡선은 일정한 간격의 전체 예측 지점으로 학습해야 합니다.')
     if pd.Timestamp(cfg['train_end'])>=pd.Timestamp(cfg['val_end']): raise ValueError('검증 종료는 학습 종료 이후여야 합니다.')
     if not cfg['targets']: raise ValueError('타깃 센서를 선택하세요.')
     if not cfg['modes'] or not set(cfg['modes'])<= {'self','environment'}: raise ValueError('입력 조건을 선택하세요.')
@@ -56,7 +64,7 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
     raw,version=project.load_data(cfg['dataset_id']);frame=hourly(raw,minimum=cfg.get('minimum',4),metadata=version['columns'])
     if frame.index.max()<=pd.Timestamp(cfg['val_end']): raise ValueError('검증 종료 이후의 테스트 자료가 없습니다.')
     run_id=uid();base=project.file('runs/'+run_id);base.mkdir(parents=True)
-    cfg=dict(cfg,engine_version='1.0.0',python=platform.python_version())
+    cfg=dict(cfg,engine_version='3.0.0',python=platform.python_version())
     write_json(base/'config.json',cfg)
     run={'config':cfg,'status':'running','folder':'runs/'+run_id,'models':[],'skipped':[]}
     project.add('run',run,run_id)
@@ -70,6 +78,8 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
             splits=window_indices(frame,target,union,cfg['lookback'],cfg['horizons'],cfg['train_end'],cfg['val_end'])
             if any(len(splits[k])<{'train':32,'validation':8,'test':8}[k] for k in splits):
                 reason={k:len(v) for k,v in splits.items()};run['skipped'].append({'sensor':target,'valid_windows':reason});progress(f'{target}: 유효 창 부족으로 제외 {reason}');continue
+            stride=min(cfg.get('evaluation_stride',1),max(1,min(len(splits['validation']),len(splits['test']))//8))
+            for name in ('validation','test'):splits[name]=splits[name][::stride]
             compare_hash=hashlib.sha256(np.concatenate([splits[k] for k in ('train','validation','test')]).tobytes()).hexdigest()
             y=frame[target].to_numpy(float);horizons=cfg['horizons'];L=cfg['lookback']
             for mode in cfg['modes']:
@@ -86,7 +96,10 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
                     meta={'sensor':target,'mode':mode,'model':kind,'inputs':inputs,'mean':mean.tolist(),'std':std.tolist(),
                           'target_scale':target_scale,'horizons':horizons,'lookback':L,'minimum':cfg.get('minimum',4),
                           'dataset_id':version['id'],'run_id':run_id,'train_end':cfg['train_end'],'val_end':cfg['val_end'],
-                          'columns_meta':{c:version['columns'].get(c,{'unit':'','role':'target'}) for c in inputs},'compare_hash':compare_hash}
+                          'columns_meta':{c:version['columns'].get(c,{'unit':'','role':'target'}) for c in inputs},'compare_hash':compare_hash,
+                          'width':cfg.get('width',32),'layers':cfg.get('layers',1),'dropout':cfg.get('dropout',.1),
+                          'learning_rate':cfg.get('learning_rate',.001),'forecast_step_hours':cfg.get('forecast_step_hours'),
+                          'evaluation_stride':stride}
                     mid=uid();folder=project.file('models/'+mid);folder.mkdir(parents=True)
                     predictor=None
                     if kind=='linear':
@@ -111,9 +124,10 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
                             def __getitem__(self,i):
                                 t=self.indices[i]
                                 return scaled[t-L+1:t+1],np.asarray([(y[t+h]-y[t])/target_scale for h in horizons],dtype=np.float32)
-                        model=network(kind,len(inputs),len(horizons)).to(device)
-                        opt=torch.optim.Adam(model.parameters(),lr=.001);loss_fn=torch.nn.MSELoss()
-                        batch=min(128,max(1,2_000_000//(L*L))) if kind=='transformer' else 128
+                        model=network(kind,len(inputs),len(horizons),meta['width'],meta['layers'],meta['dropout']).to(device)
+                        opt=torch.optim.Adam(model.parameters(),lr=meta['learning_rate']);loss_fn=torch.nn.MSELoss()
+                        requested_batch=cfg.get('batch_size',128)
+                        batch=min(requested_batch,max(1,2_000_000//(L*L*meta['layers']))) if kind=='transformer' else requested_batch
                         meta['batch_size']=batch
                         loaders={k:torch.utils.data.DataLoader(Windows(ix),batch_size=batch,shuffle=k=='train',num_workers=0) for k,ix in splits.items()}
                         best=float('inf');best_state=None;patience=0
@@ -168,8 +182,12 @@ def train(project,cfg,progress=lambda _:None,cancel=lambda:None):
             m=project.get(mid);m['status']='incomplete_run';project.update(mid,m)
         project.update(run_id,run);raise
 
-def predict(project,model_id,dataset_id=None,cancel=lambda:None,origin=None):
+def predict(project,model_id,dataset_id=None,cancel=lambda:None,origin=None,horizon_limit=None):
     model=project.get(model_id)
+    if horizon_limit is not None:
+        step=model.get('forecast_step_hours')
+        if not step or model['horizons']!=list(range(step,max(model['horizons'])+1,step)) or horizon_limit not in model['horizons']:
+            raise ValueError('학습한 전체 곡선 범위와 출력 간격 안에서 기간을 선택하세요.')
     from .history import affected
     if affected(project,model['dataset_id']):raise ValueError('취소한 데이터로 학습한 모델입니다. 현재 데이터로 다시 학습하세요.')
     if model.get('status')!='complete' or project.get(model['run_id']).get('status')!='complete':raise ValueError('완료된 학습의 모델만 예측할 수 있습니다.')
@@ -193,7 +211,7 @@ def predict(project,model_id,dataset_id=None,cancel=lambda:None,origin=None):
         delta=np.r_[1,x[-1],x.mean(0),x[-1]-x[0]]@coef
     else:
         import torch
-        net=network(kind,len(inputs),len(model['horizons']))
+        net=network(kind,len(inputs),len(model['horizons']),model.get('width',32),model.get('layers',1),model.get('dropout',.1))
         net.load_state_dict(torch.load(folder/'weights.pt',map_location='cpu',weights_only=True));net.eval()
         with torch.no_grad():delta=net(torch.from_numpy(x[None])).numpy()[0]
     values=anchor+delta*model['target_scale']
@@ -201,9 +219,11 @@ def predict(project,model_id,dataset_id=None,cancel=lambda:None,origin=None):
     ident=uid();rel='predictions/'+ident+'.csv';path=project.file(rel);path.parent.mkdir(parents=True,exist_ok=True)
     table=pd.DataFrame({'time':[origin+pd.Timedelta(hours=h) for h in model['horizons']], 'origin':origin,
                        'horizon':model['horizons'],'predicted':values,'sensor':model['sensor'],'model_id':model_id})
+    if horizon_limit is not None:table=table[table.horizon<=horizon_limit]
     table.to_csv(path,index=False,encoding='utf-8-sig')
     project.add('prediction',{'file':rel,'model_id':model_id,'dataset_id':version['id'],'sensor':model['sensor'],
-                             'origin':str(origin),'latest_available_bin':str(latest_origin),'historical_origin':origin<latest_origin,'last_target':str(table.time.max()),'unit':model['columns_meta'][model['sensor']]['unit']},ident)
+                             'origin':str(origin),'latest_available_bin':str(latest_origin),'historical_origin':origin<latest_origin,'last_target':str(table.time.max()),'unit':model['columns_meta'][model['sensor']]['unit'],
+                             **({'requested_hours':horizon_limit,'forecast_step_hours':model['forecast_step_hours'],'curve':True} if horizon_limit is not None else {})},ident)
     return ident
 
 def evaluate_prediction(project,prediction_id,dataset_id=None):

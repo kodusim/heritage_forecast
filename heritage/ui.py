@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
         for i,text in enumerate(['01   프로젝트 현황','02   데이터 관리','03   학습과 비교','04   모델과 예측','05   논문 Figure']):
             b=button(text,lambda checked=False,n=i:self.navigate(n));b.setObjectName('nav');b.setCheckable(True);left.addWidget(b);self.nav.append(b)
         left.addWidget(button('전체 고분 결과',self.open_review,True))
-        left.addStretch();left.addWidget(button('사용 설명서',self.open_manual));left.addWidget(label('LOCAL WORKSPACE\n데이터는 이 PC에 저장됩니다.'));left.addWidget(label('v2.0 · 오프라인 연구 도구'))
+        left.addStretch();left.addWidget(button('사용 설명서',self.open_manual));left.addWidget(label('LOCAL WORKSPACE\n데이터는 이 PC에 저장됩니다.'));left.addWidget(label('v3.0 · 오프라인 연구 도구'))
         outer.addWidget(sidebar)
         content=QWidget();right=QVBoxLayout(content);right.setContentsMargins(28,22,28,18);right.setSpacing(15)
         top=QHBoxLayout();top.addWidget(label('프로젝트','muted'));self.project_combo=QComboBox();self.project_combo.setMinimumWidth(210);top.addWidget(self.project_combo,1)

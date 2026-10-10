@@ -36,7 +36,7 @@ def main():
         from heritage.review_ui import ReviewWindow
         window=ReviewWindow()
     else:
-        from heritage.studio import MainWindow
+        from heritage.guided import MainWindow
         window=MainWindow()
     window.show()
     if '--screenshot' in sys.argv:

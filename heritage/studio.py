@@ -199,6 +199,7 @@ class MainWindow(LegacyWindow):
             run=self.project.get(self.run_combo.currentData());pieces=[]
             for chunk in pd.read_csv(self.project.file(run['folder']+'/predictions.csv.gz'),chunksize=150000):
                 g=chunk[(chunk['mode']==self.result_mode.currentData())&(chunk.horizon==self.result_horizon.currentData())&(chunk.split==self.result_split.currentData())]
+                if not self.show_baselines.isChecked():g=g[g.model!='persistence']
                 if self.result_sensor.currentData()!='all':g=g[g.sensor==self.result_sensor.currentData()]
                 if not g.empty:pieces.append(g)
             if not pieces:raise ValueError('이 조건의 그래프 자료가 없습니다.')

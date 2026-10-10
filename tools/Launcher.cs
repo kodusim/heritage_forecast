@@ -11,6 +11,7 @@ internal static class Launcher {
             string root = AppDomain.CurrentDomain.BaseDirectory;
             string payload = Path.Combine(root, "_internal");
             if (!Directory.Exists(payload)) payload = Path.Combine(root, "portable", "HeritageStudio", "_internal");
+            if (!Directory.Exists(payload)) payload = Path.Combine(root, "portable-v3", "HeritageStudio", "_internal");
             if (!Directory.Exists(payload)) payload = Path.Combine(root, "portable-v2", "HeritageStudio", "_internal");
             string runtime = Path.Combine(payload, "runtime", "pythonw.exe");
             string script = Path.Combine(payload, "app", "main.py");

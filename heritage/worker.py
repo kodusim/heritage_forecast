@@ -25,6 +25,12 @@ def main(request_path):
             from .history import eligible_origins
             valid,latest=eligible_origins(project,project.get(cfg['model_id']))
             result={'times':[str(x) for x in valid],'latest':str(latest),'model_id':cfg['model_id']}
+        elif kind=='preflight':
+            from .workflow import preflight
+            result=preflight(project,cfg,progress,cancel)
+        elif kind=='future_curve':
+            from .workflow import future_curve
+            result=future_curve(project,cfg['model_id'],cfg['hours'],cancel)
         elif kind=='train':
             from .engine import train
             result=train(project,cfg,progress,cancel)

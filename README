@@ -1,0 +1,65 @@
+Heritage Forecast / Heritage Studio
+
+문화유산 계측 데이터 등록, 모델 학습, 예측 관리와 Figure 생성 프로그램.
+기존 LSTM 및 최적화한 Transformer의 장기 예측 실험 코드를 함께 제공합니다.
+
+구조
+  main.py, heritage/    PySide6 데스크톱 프로그램
+  research/            일 단위 7일·30일 예측, Transformer 최적화, 재현 검증
+  data/seed/           최초 1·2·3번 고분 거동·내부 환경 계측 데이터 (CSV gzip)
+  data/seed/manifest.json  원본 출처·해시·연도별 열 매핑·결측 처리·단위
+  tools/               최초 데이터 등록, Windows 휴대용 배포 생성
+  tests/               데이터 처리, 시간 누출 방지, 모델·화면 결과 검증
+  artifacts/           실험 실행 시 생성. Git에는 포함하지 않음
+
+설치 (Python 3.12, Windows PowerShell, 저장소 루트에서)
+  py -3.12 -m venv .venv
+  .venv/Scripts/python.exe -m pip install -r requirements-dev.txt
+  .venv/Scripts/python.exe main.py
+설치 후 run.cmd로도 실행할 수 있습니다.
+
+최초 데이터 검사 및 프로그램 등록
+  .venv/Scripts/python.exe -m research.seed_data verify
+  .venv/Scripts/python.exe -m tools.import_seed
+같은 초기 데이터의 중복 등록은 건너뜁니다. --tomb 1 로 대상 선택 가능.
+실제 프로젝트는 기본적으로 %LOCALAPPDATA%/HeritageStudio에 저장됩니다.
+--home 경로 또는 HERITAGE_HOME 환경변수로 별도 작업 위치를 지정할 수 있습니다.
+새 데이터는 GUI에서 XLSX 또는 CSV로 추가하고 새로운 학습을 실행합니다.
+
+장기 예측 재현 (GUI와 별도 실행)
+  .venv/Scripts/python.exe -m research.workflow prepare
+  .venv/Scripts/python.exe -m research.workflow baseline --jobs 3
+  .venv/Scripts/python.exe -m research.workflow optimize --jobs 3
+  .venv/Scripts/python.exe -m research.workflow export
+학습은 CPU에서도 가능하며 시간이 걸립니다. --jobs 1은 순차 실행입니다.
+산출물은 artifacts/long_horizon 및 artifacts/optimized_transformer에 저장됩니다.
+이미 끝난 작업은 재사용됩니다. 데이터·학습 설정을 바꾸는 새 실험은 기존
+artifacts를 별도 보관한 후 실행하세요. 과거 결과를 덮어쓰며 비교하지 마세요.
+
+현재 GUI 학습 엔진은 시간 단위입니다. 일 단위 장기 예측·최적화 모델은
+research 실행 경로를 사용하며, 해당 가중치를 GUI로 바로 불러오지는 않습니다.
+GUI와 연구 실험이 완전히 통합되어 있다는 의미는 아닙니다.
+
+데이터 설명
+원본 Excel 파일 자체와 보고서·대화·문서는 포함하지 않습니다.
+연도별 시트에서 추출한 계측값을 CSV gzip으로 정리했습니다. 같은 시각의
+동일 값은 합치고 서로 다른 값은 결측으로 처리했으며 보간하지 않았습니다.
+이 데이터는 원본 XLSX의 모든 시트·서식·메모를 보존한 파일이 아닙니다.
+10분 자료를 하루 96개 이상 관측 시 일평균으로 변환합니다. 집계 시각은
+하루가 끝난 시각으로 표시합니다. 6-D3는 장기 평가에 필요한 관측이 부족합니다.
+내부 환경 센서는 연도별 위치·표기가 달라 단위·매핑을 확인해야 합니다.
+원자료의 사전 노이즈 제거 방식은 이 코드에서 재현하거나 보증하지 않습니다.
+
+평가 범위
+최종 학습 목표값은 2023년 이전, 검증은 2023년, 평가는 2024년입니다.
+최적화 설정은 2022·2023년 검증으로 선택합니다. 2024년은 이미 관찰한
+자료이므로 독립적인 신규 외부 시험이 아닌 후향적 평가입니다.
+단위가 다른 센서의 오차를 합산하지 않고 센서별 성능을 비교합니다.
+
+검증 / 배포 생성
+  .venv/Scripts/python.exe -m pytest tests -q
+  .venv/Scripts/python.exe -m tools.build_portable
+배포 파일은 portable/에 생성됩니다. 가상환경·배포 바이너리·모델 가중치·
+학습 로그·생성된 그래프·보고서는 Git 추적에서 제외합니다.
+오픈소스 의존성 관련 고지는 NOTICE를 참고하세요.
+소스와 데이터의 별도 재배포 라이선스는 아직 지정하지 않았습니다.

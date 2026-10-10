@@ -1,0 +1,19 @@
+# Third-party components
+
+Heritage Studio uses the following third-party software. Original copyright and license files are retained with the bundled packages and their `.dist-info` metadata. Application source is included under `app/heritage` in the portable distribution. The Python runtime is an unmodified official embedded runtime except for the application-specific `python312._pth` search-path configuration.
+
+| Component | Project and source |
+|---|---|
+| CPython | https://www.python.org/ — https://github.com/python/cpython |
+| Qt / PySide6 / Shiboken6 | https://www.qt.io/qt-for-python — https://code.qt.io/pyside/pyside-setup.git/ |
+| PyTorch | https://pytorch.org/ — https://github.com/pytorch/pytorch |
+| NumPy | https://numpy.org/ — https://github.com/numpy/numpy |
+| pandas | https://pandas.pydata.org/ — https://github.com/pandas-dev/pandas |
+| Matplotlib | https://matplotlib.org/ — https://github.com/matplotlib/matplotlib |
+| openpyxl | https://openpyxl.readthedocs.io/ |
+
+Additional transitive dependencies and versions are listed in `distribution.json`. Their notices remain in `packages`. The CPython license is in `runtime/LICENSE.txt`.
+
+Qt for Python documents its open-source and commercial licensing at https://doc.qt.io/qtforpython-6/licenses.html. Qt libraries remain dynamically linked and are not intentionally locked against replacement with compatible libraries. This document preserves attribution; it is not a separate license grant for third-party components.
+
+The official embedded runtime distribution mechanism is documented at https://docs.python.org/3.12/using/windows.html#the-embeddable-package. Runtime download source and SHA-256 are recorded in `distribution.json`.

@@ -1,0 +1,513 @@
+{
+  "schema": 1,
+  "timezone": "Asia/Seoul",
+  "nominal_interval_minutes": 10,
+  "description": "Normalized initial observation data; annual sheets only; identical duplicate values merged and conflicting cells masked. No interpolation. These are not the original XLSX containers.",
+  "missing": "empty CSV cell",
+  "files": [
+    {
+      "id": "F02",
+      "tomb": 1,
+      "role": "behavior",
+      "file": "tomb_01/behavior.csv.gz",
+      "sha256": "b0ca00f334814ded3ade4a85dc770b6b4cf0c8f39e53d2caf4774b82b3ac8e54",
+      "rows": 460204,
+      "columns": [
+        "5-D1",
+        "5-D2",
+        "5-D3",
+        "5-D4",
+        "5-T1",
+        "5-T2",
+        "5-T3-x",
+        "5-T3-y"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "source_workbook": "1. 고분(이전과 동일)/1. 1번 고분/1. 1번 고분 거동 데이터.xlsx",
+      "source_sha256": "1c697106b884ec29a052982357db65bc226f1e936c9210979541eb5797f0e424",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2017",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2018",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2019",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2020",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2021",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2022",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2023",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2024",
+          "mapping": "sensor names matched from the original header"
+        }
+      ],
+      "valid_observations": {
+        "5-D1": 398430,
+        "5-D2": 422536,
+        "5-D3": 421470,
+        "5-D4": 423762,
+        "5-T1": 390084,
+        "5-T2": 393680,
+        "5-T3-x": 357929,
+        "5-T3-y": 395370
+      },
+      "units": {
+        "5-D1": "mm",
+        "5-D2": "mm",
+        "5-D3": "mm",
+        "5-D4": "mm",
+        "5-T1": "degree",
+        "5-T2": "degree",
+        "5-T3-x": "degree",
+        "5-T3-y": "degree"
+      }
+    },
+    {
+      "id": "F03",
+      "tomb": 1,
+      "role": "environment",
+      "file": "tomb_01/environment.csv.gz",
+      "sha256": "acbb354f790059245c83b420e93966a1e196aca99cfd39adbe1292c8f787316a",
+      "rows": 460204,
+      "columns": [
+        "internal_primary",
+        "internal_backup"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "source_workbook": "1. 고분(이전과 동일)/1. 1번 고분/2. 1번 고분 환경 데이터.xlsx",
+      "source_sha256": "5deb69c4342ca3264a84511ddb9cb976a4370318979818a3ec18199c7266ea29",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 4
+          }
+        },
+        {
+          "sheet": "2017",
+          "zero_based_source_columns": {
+            "internal_primary": 4,
+            "internal_backup": 6
+          }
+        },
+        {
+          "sheet": "2018",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2019",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2020",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2021",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2022",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2023",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2024",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        }
+      ],
+      "valid_observations": {
+        "internal_primary": 429427,
+        "internal_backup": 454559
+      },
+      "units": {
+        "internal_primary": "degC",
+        "internal_backup": "degC"
+      }
+    },
+    {
+      "id": "F04",
+      "tomb": 2,
+      "role": "behavior",
+      "file": "tomb_02/behavior.csv.gz",
+      "sha256": "543fa83da2cee905355d32bd1a8c9d42be6eda0a9fcbd06cccd9dd32b0a67743",
+      "rows": 460359,
+      "columns": [
+        "6-D1",
+        "6-D2",
+        "6-D3",
+        "6-T1",
+        "6-T2",
+        "6-T3",
+        "6-T4-x",
+        "6-T4-y"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "source_workbook": "1. 고분(이전과 동일)/2. 2번 고분/1. 2번 고분 거동 데이터.xlsx",
+      "source_sha256": "b6bd17606f63a1868162ad910c596d3b8d30ac15e5121d8e1d24106d6c180d01",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2017",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2018",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2019",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2020",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2021",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2022",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2023",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2024",
+          "mapping": "sensor names matched from the original header"
+        }
+      ],
+      "valid_observations": {
+        "6-D1": 445026,
+        "6-D2": 446944,
+        "6-D3": 273759,
+        "6-T1": 325417,
+        "6-T2": 329554,
+        "6-T3": 307394,
+        "6-T4-x": 415840,
+        "6-T4-y": 415847
+      },
+      "units": {
+        "6-D1": "mm",
+        "6-D2": "mm",
+        "6-D3": "mm",
+        "6-T1": "degree",
+        "6-T2": "degree",
+        "6-T3": "degree",
+        "6-T4-x": "degree",
+        "6-T4-y": "degree"
+      }
+    },
+    {
+      "id": "F05",
+      "tomb": 2,
+      "role": "environment",
+      "file": "tomb_02/environment.csv.gz",
+      "sha256": "b219ee201525dc3df00f83a6bf4ab1aa85beb654568a790c001157ea10936d61",
+      "rows": 460367,
+      "columns": [
+        "internal_primary",
+        "internal_backup"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "source_workbook": "1. 고분(이전과 동일)/2. 2번 고분/2. 2번 고분 환경 데이터.xlsx",
+      "source_sha256": "547d7fada7f983232df79adeb5f67f914ed3393e3580d6b4ced6c6f5b8f07e56",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2017",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2018",
+          "zero_based_source_columns": {
+            "internal_primary": 2,
+            "internal_backup": 4
+          }
+        },
+        {
+          "sheet": "2019",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2020",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2021",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2022",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2023",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2024",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        }
+      ],
+      "valid_observations": {
+        "internal_primary": 459366,
+        "internal_backup": 407787
+      },
+      "units": {
+        "internal_primary": "degC",
+        "internal_backup": "degC"
+      }
+    },
+    {
+      "id": "F07",
+      "tomb": 3,
+      "role": "behavior",
+      "file": "tomb_03/behavior.csv.gz",
+      "sha256": "144284e07ae5d2ebfa6fc8a9198aad9850db548dc02ca762a05c61b10be19a2c",
+      "rows": 453532,
+      "columns": [
+        "M-D1",
+        "M-D2",
+        "M-D3",
+        "M-T1",
+        "M-T2",
+        "M-T3-x",
+        "M-T3-y"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2024-12-31 23:50:00",
+      "source_workbook": "1. 외기상 데이터 (전체 고분 동일).xlsx",
+      "source_sha256": "ca2579d72fbe539e4ba9934e55079461af549fcbdddf06968aef9e10f7a77492",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2017",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2018",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2019",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2020",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2021",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2022",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2023",
+          "mapping": "sensor names matched from the original header"
+        },
+        {
+          "sheet": "2024",
+          "mapping": "sensor names matched from the original header"
+        }
+      ],
+      "valid_observations": {
+        "M-D1": 304446,
+        "M-D2": 294287,
+        "M-D3": 306745,
+        "M-T1": 390478,
+        "M-T2": 425465,
+        "M-T3-x": 348914,
+        "M-T3-y": 354743
+      },
+      "units": {
+        "M-D1": "mm",
+        "M-D2": "mm",
+        "M-D3": "mm",
+        "M-T1": "degree",
+        "M-T2": "degree",
+        "M-T3-x": "degree",
+        "M-T3-y": "degree"
+      }
+    },
+    {
+      "id": "F08",
+      "tomb": 3,
+      "role": "environment",
+      "file": "tomb_03/environment.csv.gz",
+      "sha256": "cbfbd63e069959a939fea640b89ce51cae66dff21d7f14854a1e3bd2baaab3e9",
+      "rows": 453532,
+      "columns": [
+        "internal_primary",
+        "internal_backup"
+      ],
+      "start": "2016-04-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "source_workbook": "3. 3번 고분/2. 3번 고분 환경 데이터.xlsx",
+      "source_sha256": "7fbdfc59c99eed2ee706459a21e08455ed19a8007a711359a26215fdd695954e",
+      "annual_sheet_mapping": [
+        {
+          "sheet": "2016",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2017",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2018",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2019",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2020",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2021",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2022",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2023",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        },
+        {
+          "sheet": "2024",
+          "zero_based_source_columns": {
+            "internal_primary": 1,
+            "internal_backup": 3
+          }
+        }
+      ],
+      "valid_observations": {
+        "internal_primary": 436262,
+        "internal_backup": 376309
+      },
+      "units": {
+        "internal_primary": "degC",
+        "internal_backup": "degC"
+      }
+    }
+  ]
+}
